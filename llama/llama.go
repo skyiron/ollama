@@ -334,9 +334,11 @@ func NewBatch(batchSize int, maxSeq int, embedSize int) (*Batch, error) {
 		embedSize: embedSize,
 	}
 
-	if (embedSize == 0 && b.c.token == nil) || (embedSize != 0 && b.c.embd == nil) ||
+	nilPointer := (embedSize == 0 && b.c.token == nil) || (embedSize != 0 && b.c.embd == nil) ||
 		b.c.pos == nil || b.c.n_seq_id == nil || b.c.seq_id == nil || b.c.logits == nil ||
-		slices.Contains(unsafe.Slice(b.c.seq_id, b.allocSize()), nil) {
+		slices.Contains(unsafe.Slice(b.c.seq_id, b.allocSize()), nil)
+
+	if nilPointer {
 		return nil, fmt.Errorf("unable to allocate batch (batchSize=%v maxSeq=%v embedSize=%v)", batchSize, maxSeq, embedSize)
 	}
 
